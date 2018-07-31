@@ -1,0 +1,4 @@
+.yardımcıvenv
+.idea
+.settings.py
+*.sqlite3
