@@ -2,6 +2,12 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from .forms import CustomUserCreationForm
 
+def home(request):
+    return redirecet('account/login.html')
+
+def profile(request):
+    return redirect('account/profile.html')
+
 def signup(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
