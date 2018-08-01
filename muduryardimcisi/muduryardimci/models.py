@@ -1,10 +1,9 @@
-from django.db import models
 from django.conf import settings
-from django.core.validators import RegexValidator
+from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+from django.core.validators import RegexValidator
 
 class Site(models.Model):
 
@@ -23,8 +22,12 @@ class Site(models.Model):
         return self.domain
 
 class Courses(models.Model):
-
     course_name = models.CharField(max_length=255)
+    course_token = models.CharField(max_length=255,
+                                    default="",
+                                    null="")
+
+
     trainess = models.ForeignKey(
                default="",
                to=settings.AUTH_USER_MODEL,
@@ -100,3 +103,31 @@ class Note(models.Model):
 
     def __str__(self):
         return self.notes
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    course_id = models.ForeignKey(
+                default=None,
+                to=Courses,
+                on_delete=models.CASCADE,
+                blank=True,
+                null=True,
+                )
+
+    email = models.CharField(
+                    max_length=255,
+                    blank=True,
+                    null=True,
+            )
+    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$',
+                                 message="""Telefon numaranız 5340775723 şeklinde girilmelidir."
+                                          14 haneye kadar izin verilir. """,)
+
+    cellphone = models.CharField(validators=[phone_regex],max_length=14)
+    telegram_username = models.CharField(
+                        max_length=25,
+                        blank=True,
+                        null=True,)
+    def __str__(self):
+        return self.email
