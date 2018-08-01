@@ -22,8 +22,12 @@ class Site(models.Model):
         return self.domain
 
 class Courses(models.Model):
-
     course_name = models.CharField(max_length=255)
+    course_token = models.CharField(max_length=255,
+                                    default="",
+                                    null="")
+
+
     trainess = models.ForeignKey(
                default="",
                to=settings.AUTH_USER_MODEL,
@@ -127,13 +131,3 @@ class Profile(models.Model):
                         null=True,)
     def __str__(self):
         return self.email
-
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
