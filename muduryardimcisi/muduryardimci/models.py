@@ -129,5 +129,9 @@ class Profile(models.Model):
                         max_length=25,
                         blank=True,
                         null=True,)
+    is_trainer = models.BooleanField(
+                 default=False,
+
+    )
     def __str__(self):
         return self.email
