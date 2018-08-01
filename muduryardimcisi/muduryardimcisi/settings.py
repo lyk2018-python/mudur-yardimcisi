@@ -24,7 +24,6 @@ SECRET_KEY = 'ow83k_c6&mr)6a#&=6&f#0+9xg$_k5i3nz$n@*1^@7!fd!kats'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -55,7 +54,7 @@ ROOT_URLCONF = 'muduryardimcisi.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
