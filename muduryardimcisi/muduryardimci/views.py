@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django_otp.oath import hotp
-from .models import Courses,Profile,Check
+from .models import Courses,Profile,Check,Site
 import random
 from time import gmtime, strftime
 
@@ -15,10 +15,11 @@ def generate_token(request):
     return render(request, 'auth.html', {"token": token})
 
 def stundent_check(request):
+    get_start_time = Profile.objects.get()
     time_now = strftime("%H:%M", gmtime())
     import pdb
     pdb.set_trace()
-    get_course_id = Profile.objects.get(user=request.user, is_trainer=True).course_id
+    get_course_id = Profile.objects.get(user=request.user, is_trainer=False).course_id
     get_check_id = Check.objects.get_or_create(course_id = get_course_id,user_id=request.user,course_check="")
     get_check_id.save()
     return render(request, 'check_stundent.html',)

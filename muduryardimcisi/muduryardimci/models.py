@@ -14,6 +14,7 @@ class Site(models.Model):
     domain = models.CharField(max_length=100)
     start_date = models.DateField()
     end_Date = models.DateField()
+    course_start = models.CharField(max_length=15)
     total_morning_date = models.FloatField()
     total_afternoon_date = models.FloatField()
     total_evening_date = models.FloatField()
