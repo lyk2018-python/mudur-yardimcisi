@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block content %}
+{% for c in check %}
+	<h2>{{c}}</h2>
+{% endfor %}
+{% endblock %}
