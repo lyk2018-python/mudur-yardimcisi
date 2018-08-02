@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django_otp.oath import hotp
 from .models import Courses,Profile,Check
 import random
@@ -17,3 +17,12 @@ def stundent_check(request):
     get_course_id = Profile.objects.get(user=request.user, is_trainer=True).course_id
     get_check_id = Check.objects.get_or_create(course_id = get_course_id,user_id=request.user,course_check="")
     get_check_id.save()
+
+
+
+def dashboard(request):
+    check = Check.objects.all().values()
+    return render(request, 'accounts/dashboard.html',{"check": check})
+
+
+
