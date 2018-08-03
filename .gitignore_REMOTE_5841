@@ -1,0 +1,8 @@
+.yardımcıvenv
+.idea
+.settings.py
+*.sqlite3
+migrations
+__pycache__/
+*.py[cod]
+*$py.class
