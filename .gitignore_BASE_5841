@@ -1,0 +1,5 @@
+.yardımcıvenv
+.idea
+.settings.py
+*.sqlite3
+migrations
