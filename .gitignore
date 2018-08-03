@@ -3,4 +3,6 @@
 .settings.py
 *.sqlite3
 migrations
-__pycache__
+__pycache__/
+*.py[cod]
+*$py.class
