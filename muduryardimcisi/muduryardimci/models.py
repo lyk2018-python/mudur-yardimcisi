@@ -26,7 +26,8 @@ class Courses(models.Model):
     course_token = models.CharField(
                    max_length=255,
                    default="",
-                   null="")
+                   null="",
+                   blank=True,)
 
 
     trainess = models.ForeignKey(
@@ -57,24 +58,25 @@ class Courses(models.Model):
         verbose_name_plural = "Courses"
 
 class Check(models.Model):
-
     course_id = models.ForeignKey(
                 default="",
                 to=Courses,
                 related_name="Check_Course_id",
-                on_delete=models.CASCADE
+                on_delete=models.CASCADE,
+                blank=True,
                                   )
     user_id = models.ForeignKey(
                default="",
                to=settings.AUTH_USER_MODEL,
                related_name="Check_user_id",
-               on_delete=models.CASCADE
+               on_delete=models.CASCADE,
+               blank=True,
     )
 
-    course_check = models.CharField(max_length=255, unique=True) # öğrenci Tablosu yapılacak
-    check_morning = models.BooleanField(default=False)
-    check_afternoon = models.BooleanField(default=False)
-    check_evening = models.BooleanField(default=False)
+    course_check = models.CharField(max_length=255, unique=True,blank=True)
+    check_morning = models.BooleanField(default=False,blank=True)
+    check_afternoon = models.BooleanField(default=False,blank=True)
+    check_evening = models.BooleanField(default=False,blank=True,)
 
     def __str__(self):
         return self.course_check
