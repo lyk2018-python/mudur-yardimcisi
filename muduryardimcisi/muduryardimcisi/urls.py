@@ -8,8 +8,8 @@ urlpatterns = [
     path('login/', auth_views.login, name='login'),
     path('logout/', auth_views.logout, name='logout'),
     path('admin/', admin.site.urls),
-    path('auth/',  muduryardimci_views.generate_token),
+    path('auth/',  views.generate_token)
     path('', account_views.home),
     path('profile/', account_views.profile),
-    path('checkstun/', muduryardimci_views.stundent_check, name="check_stundent"),
+    path('accounts/', views.dashboard, name='dashboard'),
 ]
