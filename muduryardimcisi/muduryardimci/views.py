@@ -69,6 +69,6 @@ def stundent_check(request):
 
     return render(request, 'check_stundent.html',)
 def dashboard(request):
-    check = Check.objects.all().values()
+    check = Check.objects.all()
     return render(request, 'accounts/dashboard.html',{"check": check})
 

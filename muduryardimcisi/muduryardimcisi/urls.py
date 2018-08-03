@@ -8,6 +8,8 @@ urlpatterns = [
     path('login/', auth_views.login, name='login'),
     path('logout/', auth_views.logout, name='logout'),
     path('admin/', admin.site.urls),
+    path('auth/',  views.generate_token, name="auth"),
+    path('accounts/', views.dashboard, name='dashboard'),
     path('auth/',  muduryardimci_views.generate_token),
     path('', account_views.home),
     path('profile/', account_views.profile),

@@ -3,4 +3,11 @@
 .settings.py
 *.sqlite3
 migrations
-__pycache__
+.yardımcıvenv
+.idea
+.settings.py
+*.sqlite3
+migrations
+pycache/
+*.py[cod]
+*$py.class
