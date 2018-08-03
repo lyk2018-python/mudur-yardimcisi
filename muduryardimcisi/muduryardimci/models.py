@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.core.validators import RegexValidator
 
 class Site(models.Model):
@@ -14,7 +12,7 @@ class Site(models.Model):
     domain = models.CharField(max_length=100)
     start_date = models.DateField()
     end_Date = models.DateField()
-    course_start = models.CharField(max_length=15)
+    course_start = models.CharField(max_length=15,default="")
     total_morning_date = models.FloatField()
     total_afternoon_date = models.FloatField()
     total_evening_date = models.FloatField()
@@ -24,9 +22,11 @@ class Site(models.Model):
 
 class Courses(models.Model):
     course_name = models.CharField(max_length=255)
-    course_token = models.CharField(max_length=255,
-                                    default="",
-                                    null="")
+
+    course_token = models.CharField(
+                   max_length=255,
+                   default="",
+                   null="")
 
 
     trainess = models.ForeignKey(

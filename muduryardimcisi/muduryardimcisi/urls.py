@@ -3,11 +3,13 @@ from django.urls import path
 from muduryardimci import views as muduryardimci_views
 from django.contrib.auth import views as auth_views
 from accounts import views as account_views
+
 urlpatterns = [
     path('login/', auth_views.login, name='login'),
     path('logout/', auth_views.logout, name='logout'),
     path('admin/', admin.site.urls),
     path('auth/',  muduryardimci_views.generate_token),
     path('', account_views.home),
-    path('profile/', account_views.profile)
+    path('profile/', account_views.profile),
+    path('checkstun/', muduryardimci_views.stundent_check, name="check_stundent"),
 ]
