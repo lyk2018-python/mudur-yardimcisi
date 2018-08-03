@@ -5,8 +5,6 @@ import random
 from time import localtime, strftime
 
 def generate_token(request):
-	if request.method = 'POST':
-		
     key = bytes(random.randint(1000000,99999999))
     for i in range(1):
         token = hotp(key=key, counter=i, digits=6)
@@ -52,16 +50,23 @@ def stundent_check(request):
     min_now = float(min_now) /100
     hour_now = float(hour_now)
     time_now = hour_now + min_now
+
     if time_now > morning and time_now < afternoon and time_now < evening:
         check_time = "morning"
     elif time_now > morning and time_now > afternoon and time_now < evening:
         check_time = "afternoon"
     elif time_now > morning and time_now > afternoon and time_now > evening:
         check_time = "evening"
-    print(check_time)
-    #get_course_id = Profile.objects.get(user=request.user, is_trainer=False).course_id
-    #get_or_create_check_id = Check.objects.get_or_create(course_id = get_course_id,user_id=request.user)
-    #get_or_create_check_id.save()
+
+    get_course_id = Profile.objects.get(user=request.user, is_trainer=True).course_id
+    Check.objects.get_or_create(course_id = get_course_id,user_id=request.user)
+    if check_time == "evening":
+        Check.objects.filter(course_id=get_course_id,user_id=request.user).update(check_evening=True)
+    elif check_time == "afternoon":
+        Check.objects.filter(course_id=get_course_id, user_id=request.user).update(check_afternoon=True)
+    elif check_time == "morning":
+        Check.objects.filter(course_id=get_course_id, user_id=request.user).update(check_morning=True)
+
     return render(request, 'check_stundent.html',)
 def dashboard(request):
     check = Check.objects.all()
