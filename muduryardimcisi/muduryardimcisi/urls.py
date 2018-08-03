@@ -20,6 +20,6 @@ from muduryardimci import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('auth/',  views.generate_token),
+    path('auth/',  views.generate_token, name="auth"),
     path('accounts/', views.dashboard, name='dashboard'),
 ]

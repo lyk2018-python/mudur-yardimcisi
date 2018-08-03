@@ -4,6 +4,8 @@ from .models import Courses,Profile,Check
 import random
 
 def generate_token(request):
+	if request.method = 'POST':
+		
     key = bytes(random.randint(1000000,99999999))
     for i in range(1):
         token = hotp(key=key, counter=i, digits=6)
@@ -21,7 +23,7 @@ def stundent_check(request):
 
 
 def dashboard(request):
-    check = Check.objects.all().values()
+    check = Check.objects.all()
     return render(request, 'accounts/dashboard.html',{"check": check})
 
 

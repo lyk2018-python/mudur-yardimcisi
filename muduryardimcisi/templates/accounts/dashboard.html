@@ -1,7 +1,63 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% block content %}
-{% for c in check %}
-	<h2>{{c}}</h2>
-{% endfor %}
+
+<form method="post">
+  {% csrf_token %}
+  <br><button type="submit" href="{% url 'auth' %}">Token</button>
+</form>
+
+
+
+
+<div class="container"> 
+
+	<table class="table table-striped table-dark" style="margin:40px 0;">
+	  <thead>
+	    <tr>
+       	      <th scope="col">Id</th>
+	      <th scope="col">Course Id</th>
+	      <th scope="col">User Id</th>
+	      <th scope="col">Course Check</th>
+	      <th scope="col">Check Morning</th>
+		<th scope="col">Check Afternoon</th>
+		<th scope="col">Check Evening</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+		{% for che in check %}
+			<tr> 
+			<td> {{che.id}}</td>
+			<td> {{che.course_id}} </td>
+			<td> {{che.user_id}} </td>
+			<td> {{che.course_check}} </td>
+			{% if che.check_morning == True %}  
+                           <td><img src="/static/admin/img/icon-yes.svg"<img src="/static/admin/img/icon-yes.svg" alt="True"> </td>
+			{% else %}
+                           <td><img src="/static/admin/img/icon-no.svg" alt="False"> </td>
+			{% endif %}
+
+			{% if che.check_afternoon == True %}  
+                           <td><img src="/static/admin/img/icon-yes.svg"<img src="/static/admin/img/icon-yes.svg" alt="True"> </td>
+			{% else %}
+                           <td><img src="/static/admin/img/icon-no.svg" alt="False"> </td>
+			{% endif %}
+
+			{% if che.check_evening == True %}  
+                           <td><img src="/static/admin/img/icon-yes.svg"<img src="/static/admin/img/icon-yes.svg" alt="True"> </td>
+			{% else %}
+                           <td><img src="/static/admin/img/icon-no.svg" alt="False"> </td>
+			{% endif %}
+
+			</tr>
+			
+		{% endfor %}
+
+	  </tbody>
+	</table>
+
+
+</div>
+
+
 {% endblock %}
