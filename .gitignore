@@ -9,5 +9,6 @@ migrations
 *.sqlite3
 migrations
 pycache/
+__pycache__/
 *.py[cod]
 *$py.class
