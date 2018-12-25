@@ -16,7 +16,7 @@ def superuser_token(request):
         key = bytes(random.randint(1000000, 99999999))
         for k in range(1):
             token = hotp(key=key, counter=k, digits=6)
-            if len(str(token)) < 6:
+            if len(str(token)) < 10:
                 token = (6 - len(str(token))) * str(random.randint(1, 9)) + str(token)
         course_list +=([i.course_name,i.course_token,token])
         #print(course_list[0:1])
@@ -37,10 +37,12 @@ def superuser_token(request):
 
 
 def generate_token(request):
+    hour_now, min_now = str(strftime("%H:%M", localtime())).split(":")
     key = bytes(random.randint(1000000, 99999999))
     for i in range(1):
         token = hotp(key=key, counter=i, digits=6)
-        if len(str(token)) < 6:
+        token = str(token) + str(hour_now) + str(min_now)
+        if len(str(token)) < 10:
             token = (6 - len(str(token))) * str(random.randint(1, 9)) + str(token)
     get_course_id = Profile.objects.get(user=request.user)
     if get_course_id.is_trainer == True:
