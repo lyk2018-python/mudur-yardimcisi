@@ -1,8 +1,8 @@
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 from django.core.validators import RegexValidator
-
 class Site(models.Model):
 
     name = models.CharField(max_length=255, unique=True)
@@ -73,37 +73,11 @@ class Check(models.Model):
                blank=True,
     )
 
-    course_check = models.CharField(max_length=255, unique=True,blank=True)
-    check_morning = models.BooleanField(default=False,blank=True)
-    check_afternoon = models.BooleanField(default=False,blank=True)
-    check_evening = models.BooleanField(default=False,blank=True,)
-
-    def __str__(self):
-        return self.course_check
-
-class Note(models.Model):
-    user_id = models.ForeignKey(
-            default="",
-            to=settings.AUTH_USER_MODEL,
-            related_name="Note_user_id",
-            on_delete=models.CASCADE,
-            )
-    trainer_id = models.ForeignKey(
-            default="",
-            to=settings.AUTH_USER_MODEL,
-            related_name="Note_trainer_id",
-            on_delete=models.CASCADE,
-            )
-    notes = models.TextField(
-            max_length=2000
-            )
-    site_id = models.ForeignKey(
-            default="",
-            to=Site,
-            related_name="Note_site_id",
-            on_delete=models.CASCADE,
-            )
-
+    course_check = models.NullBooleanField(null=True, blank=True, primary_key=False,)
+    check_morning = models.NullBooleanField(null=True, blank=True, primary_key=False,)
+    check_afternoon = models.NullBooleanField(null=True, blank=True, primary_key=False,)
+    check_evening = models.NullBooleanField(null=True, blank=True, primary_key=False,)
+    check_date = models.DateField(default=timezone.now(), blank=True,)
     def __str__(self):
         return self.notes
 
@@ -136,5 +110,10 @@ class Profile(models.Model):
                  default=False,
 
     )
+    token_remains = models.IntegerField(
+                    default=3,
+                    blank=True,
+                    null=True,
+    )
     def __str__(self):
-        return self.email
+        return self.cellphone

@@ -1,6 +1,6 @@
 {% extends "base.html" %}}
 
-{% block title %}Auth Login{% endblock %}
+{% block title %}Check{% endblock %}
 {% block content %}
 
 {% if error %}
@@ -8,20 +8,19 @@
 {% endif %}
 
 {% if form %}
- {% if user.is_authenticated %}
-  <h2>Auth Login</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" onclick="this.form.submit(); this.disabled=true; this.value='Sending…'">Submit</button>
-  </form>
-  {% else %}
-   <h2>You need login</h2>
-   <div class="info warning">
-     <a href="{% url 'login' %}">Login</a>
-     <a>or</a>
-     <a>to add submit word</a>
-   </div>
-  {% endif %}
-{% endif %}
+  {% if user.is_authenticated %}
+    <h2>Check Control</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" onclick="this.form.submit(); this.disabled=true; this.value='Sending…'">Submit</button><br><br>
+      <strong>You have {{token_remains}} Attempt </strong>
+    </form>
+    {% else %}
+    <h2>You need login</h2>
+    <div class="info warning">
+      <a href="{% url 'login' %}">Login</a>
+    </div>
+   {% endif %}
+ {% endif %}
 {% endblock %}

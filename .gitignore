@@ -3,6 +3,7 @@
 .settings.py
 *.sqlite3
 migrations
+.venv
 .yardımcıvenv
 .idea
 .settings.py

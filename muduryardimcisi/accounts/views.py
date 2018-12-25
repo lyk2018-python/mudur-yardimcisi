@@ -4,7 +4,7 @@ def home(request):
     return redirect('/login')
 
 def profile(request):
-    return redirect('account/profile.html')
+    return redirect('accounts')
 
 def dashboard(request):
     return render(request, 'accounts/dashboard.html')

@@ -1,9 +1,40 @@
 from django.shortcuts import render, redirect, reverse
 from django_otp.oath import hotp
+from django.http import HttpResponse,HttpResponseRedirect
 from .models import Courses, Profile, Check, Site
-from muduryardimci.forms import AuthTokenForm, AddNoteForm
+from muduryardimci.forms import AuthTokenForm
+from django.utils import timezone
 import random
 from time import localtime, strftime
+
+def superuser_token(request):
+    hour_now, min_now = str(strftime("%H:%M", localtime())).split(":")
+    course_list = []
+    get_course_id = Profile.objects.get(user=request.user)
+    all_courses = Courses.objects.all()
+    for i in all_courses:
+        key = bytes(random.randint(1000000, 99999999))
+        for k in range(1):
+            token = hotp(key=key, counter=k, digits=6)
+            if len(str(token)) < 6:
+                token = (6 - len(str(token))) * str(random.randint(1, 9)) + str(token)
+        course_list +=([i.course_name,i.course_token,token])
+        #print(course_list[0:1])
+        token_cache = int(token)
+    if get_course_id.is_trainer == True:
+        print("")
+        get_course_id = get_course_id.course_id
+    else:
+        token = "ACCESS DENIED"
+    if request.user.is_superuser == True:
+        print("")
+        token = int(token_cache)
+        token = str(token) + str(hour_now) +str(min_now)
+    get_course_token = Courses.objects.filter(course_name=get_course_id).update(course_token=token)
+    if request.user.is_superuser == True:
+        get_course_token = Courses.objects.all().update(course_token=token)
+    return render(request, 'auth.html', {"token": token})
+
 
 def generate_token(request):
     key = bytes(random.randint(1000000, 99999999))
@@ -11,16 +42,20 @@ def generate_token(request):
         token = hotp(key=key, counter=i, digits=6)
         if len(str(token)) < 6:
             token = (6 - len(str(token))) * str(random.randint(1, 9)) + str(token)
-    get_course_id = Profile.objects.get(user=request.user, is_trainer=True).course_id
+    get_course_id = Profile.objects.get(user=request.user)
+    if get_course_id.is_trainer == True:
+        print("")
+        get_course_id = get_course_id.course_id
+    else:
+        token = "ACCESS DENIED"
     get_course_token = Courses.objects.filter(course_name=get_course_id).update(course_token=token)
     return render(request, 'auth.html', {"token": token})
 
 def stundent_check(request):
-    main_site_name = "2018 kamp"
+    main_site_name = Site.objects.get(is_active=True).name
     get_start_time = Site.objects.get(is_active=True, name=main_site_name).course_start
     get_total_morning_date = float(Site.objects.get(is_active=True, name=main_site_name).total_morning_date)
     get_total_afternoon_date = float(Site.objects.get(is_active=True, name=main_site_name).total_afternoon_date)
-
     def calucate_time(time):
         try:
             start_hour, start_min = str(get_start_time).split(":")
@@ -50,26 +85,29 @@ def stundent_check(request):
     min_now = float(min_now) /100
     hour_now = float(hour_now)
     time_now = hour_now + min_now
-    timeout = 20
-    if time_now > morning and time_now < afternoon and time_now < evening:
+    timeout = 0.2 ## 20 min
+    #print(time_now,morning,afternoon,evening) ## Some Print Debugging :) Yep ı dont love logging libary
+    if time_now >= morning and time_now < afternoon and time_now < evening:
         if time_now > morning + timeout:
             check_time = "Timeout"
         else:
             check_time = "morning"
-    elif time_now > morning and time_now > afternoon and time_now < evening:
+    elif time_now > morning and time_now >= afternoon and time_now < evening:
         if time_now > afternoon + timeout:
             check_time = "Timeout"
         else:
             check_time = "afternoon"
-    elif time_now > morning and time_now > afternoon and time_now > evening:
+    elif time_now > morning and time_now > afternoon and time_now >= evening:
         if time_now > evening + timeout:
-            check_time = "timeout"
+            check_time = "Timeout"
         else:
             check_time = "evening"
-
+    #print(check_time)
     get_course_id = Profile.objects.get(user=request.user, is_trainer=False).course_id
-    Check.objects.get_or_create(course_id = get_course_id,user_id=request.user)
-    if check_time == "evening":
+    Check.objects.get_or_create(course_id = get_course_id,user_id=request.user,check_date=timezone.now())
+    if check_time == "Timeout":
+        return "timeout"
+    elif check_time == "evening":
         Check.objects.filter(course_id=get_course_id,user_id=request.user).update(check_evening=True)
         return render(request, 'check_stundent.html',)
     elif check_time == "afternoon":
@@ -78,50 +116,43 @@ def stundent_check(request):
     elif check_time == "morning":
         Check.objects.filter(course_id=get_course_id, user_id=request.user).update(check_morning=True)
         return render(request, 'check_stundent.html',)
-    elif check_time == "Timeout":
-        return("timeout")
-
 def dashboard(request):
-    check = Check.objects.all()
-    return render(request, 'accounts/dashboard.html', {"check": check})
+    course_id = Profile.objects.get(user=request.user).course_id
+    check = Check.objects.filter(course_id=course_id,check_date=timezone.now())
+    try :
+        is_trainer = Profile.objects.get(user=request.user)
+    except TypeError:
+        return render(request, 'err.html')
+    return render(request, 'accounts/dashboard.html', {"check": check, "profile" : is_trainer})
 
 def AuthToken(request):
+    get_token_remains = Profile.objects.get(user=request.user).token_remains
+    if int(get_token_remains) <= 0:
+        banned = True
+        return HttpResponse("<html><strong>Your account has been disabled. Contact your trainer</strong></html>")
     form = AuthTokenForm()
     if request.method == "POST":
         form = AuthTokenForm(request.POST)
         if form.is_valid():
             get_course_id = Profile.objects.get(user=request.user, is_trainer=False).course_id
             get_course_token = Courses.objects.get(course_name=get_course_id).course_token
-            if form.cleaned_data['token_label'] == get_course_token:
+            hour_now, min_now = str(strftime("%H:%M", localtime())).split(":")
+            min_now = float(min_now) / 100
+            hour_now = float(hour_now)
+            time_now = hour_now + min_now
+            token_label = form.cleaned_data['token_label']
+            token_hour = int(token_label[6:8])
+            token_min = int(token_label[8:]) / 100
+            time_token = token_hour + token_min ## Calucating token time.
+            if token_label == get_course_token and (time_now - time_token) <= 0.6:
                 a = stundent_check(request)
-                print(type(a))
-                import pdb
-                pdb.set_trace()
-                if type(a) == "'django.http.response.HttpResponse'":
-                   print("adadsadsadsadsad")
-
+                if a == "timeout":
+                    return HttpResponse("<html><strong>I am Sorry Dude Timeout.</strong></html>")
                 else:
-                    return redirect(reverse("login"))
-                return redirect(reverse("SucsessAuth"))
+                    return HttpResponse("<html><strong>Thanks For Checking. :)</strong></html>")
+                update_token_remains = Profile.objects.filter(user=request.user).update(token_remains=3)
+
             else:
-                return render(request, "whutt")
-    return render(request, 'authlogin.html', {'form' : form})
-
-def SucssesAuth(request):
-    return render(request, 'sucssesauth.html')
-
-def AddNote(request):
-
-    def get_form_kwargs(self):
-        kwargs = super(AddNote, self).get_form_kwargs()
-        kwargs.update({'user': self.request.user})
-        return kwargs
-    
-    get_course_id = Profile.objects.get(user=request.user, is_trainer=False).course_id
-    form = AddNoteForm()
-    if request.method == "POST":
-        form = AddNoteForm(request.POST)
-        if form.is_valid():
-            get_user = form.cleaned_data['User']
-            get_note = form.cleaned_data['Note']
-    return render(request, "Addnote.html", {'form' : form})
+                Profile.objects.filter(user=request.user).update(token_remains=get_token_remains - 1)
+                return HttpResponse("<strong><p>Token Error.</strong></html>")
+    return render(request, 'authlogin.html', {'form' : form, "token_remains" : get_token_remains,})
