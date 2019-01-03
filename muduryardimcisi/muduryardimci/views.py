@@ -123,25 +123,23 @@ def stundent_check(request):
         user_id=request.user,
         check_date=timezone.now())
     if check_time == "Timeout":
-        return "timeout"
+        return HttpResponse("<html><strong>Your account has been disabled. Contact your trainer</strong></html>")
     elif check_time == "evening":
         Check.objects.filter(
             course_id=get_course_id,
             user_id=request.user).update(
             check_evening=True)
-        return render(request, 'check_stundent.html',)
     elif check_time == "afternoon":
         Check.objects.filter(
             course_id=get_course_id,
             user_id=request.user).update(
             check_afternoon=True)
-        return render(request, 'check_stundent.html',)
     elif check_time == "morning":
         Check.objects.filter(
             course_id=get_course_id,
             user_id=request.user).update(
             check_morning=True)
-        return render(request, 'check_stundent.html',)
+    return render(request, 'check_stundent.html',)
 
 
 def dashboard(request):
@@ -154,14 +152,14 @@ def dashboard(request):
     except TypeError:
         return render(request, 'err.html')
     return render(request, 'accounts/dashboard.html',
-                  {"check": check, "profile": is_trainer})
+                  {"check": check,
+                   "profile": is_trainer,})
 
 
 def AuthToken(request):
     get_token_remains = Profile.objects.get(user=request.user).token_remains
     if int(get_token_remains) <= 0:
-        return HttpResponse(
-            "<html><strong>Your account has been disabled. Contact your trainer</strong></html>")
+        return HttpResponse("<html><strong>Your account has been disabled. Contact your trainer</strong></html>")
     form = AuthTokenForm()
     if request.method == "POST":
         form = AuthTokenForm(request.POST)
@@ -178,18 +176,13 @@ def AuthToken(request):
             token_hour = int(token_label[6:8])
             token_min = int(token_label[8:]) / 100
             time_token = token_hour + token_min  # Calucating token time.
-            if token_label == get_course_token and (
-                    time_now - time_token) <= 0.6:
+            if token_label == get_course_token and (time_now - time_token) <= 0.6:
                 check_period = stundent_check(request)
                 if check_period == "timeout":
-                    return HttpResponse(
-                        "<html><strong>I am Sorry Dude Timeout.</strong></html>")
+                    return HttpResponse( "<html><strong>I am Sorry Dude Timeout.</strong></html>")
                 else:
-                    return HttpResponse(
-                        "<html><strong>Thanks For Checking. :)</strong></html>")
-                update_token_remains = Profile.objects.filter(
-                    user=request.user).update(token_remains=3)
-
+                    Profile.objects.filter(user=request.user).update(token_remains=3)
+                    return HttpResponse("<html><strong>Thanks For Checking. :)</strong></html>")
             else:
                 Profile.objects.filter(
                     user=request.user).update(
