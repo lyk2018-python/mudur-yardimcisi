@@ -1,14 +1,19 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% block title %}Checks{% endblock %}
 {% block content %}
 
 <form method="post">
   {% csrf_token %}
-  <br><button type="submit" href="{% url 'auth' %}">Token</button>
+	{% if request.user.is_superuser %}
+		<a href="{% url 'supertoken'  %}" class="btn btn-primary">Generate SuperUser Token</a>&nbsp;&nbsp;&nbsp;
+	{% endif %}
+	{% if profile.is_trainer %}
+		<a href="{% url 'auth'  %}" class="btn btn-primary">Generate Token</a>
+	{% else %}
+		<a href="{% url 'Authlogin'  %}" class="btn btn-primary">Check it !</a>
+	{% endif %}
 </form>
-
-
-
 
 <div class="container"> 
 
@@ -18,7 +23,6 @@
        	      <th scope="col">Id</th>
 	      <th scope="col">Course Id</th>
 	      <th scope="col">User Id</th>
-	      <th scope="col">Course Check</th>
 	      <th scope="col">Check Morning</th>
 		<th scope="col">Check Afternoon</th>
 		<th scope="col">Check Evening</th>
@@ -30,33 +34,32 @@
 			<td> {{che.id}}</td>
 			<td> {{che.course_id}} </td>
 			<td> {{che.user_id}} </td>
-			<td> {{che.course_check}} </td>
-			{% if che.check_morning == True %}  
+			{% if che.check_morning == True %}
+
                            <td><img src="/static/admin/img/icon-yes.svg"<img src="/static/admin/img/icon-yes.svg" alt="True"> </td>
+			{% elif che.check_morning == None %}
+							<td><img src="/static/admin/img/icon-unknown.svg"<img src="/static/admin/img/icon-unknown.svg" alt="unknown"> </td>
 			{% else %}
                            <td><img src="/static/admin/img/icon-no.svg" alt="False"> </td>
 			{% endif %}
-
 			{% if che.check_afternoon == True %}  
                            <td><img src="/static/admin/img/icon-yes.svg"<img src="/static/admin/img/icon-yes.svg" alt="True"> </td>
+			{% elif che.check_afternoon == None %}
+							<td><img src="/static/admin/img/icon-unknown.svg"<img src="/static/admin/img/icon-unknown.svg" alt="unknown"> </td>
 			{% else %}
                            <td><img src="/static/admin/img/icon-no.svg" alt="False"> </td>
 			{% endif %}
-
 			{% if che.check_evening == True %}  
                            <td><img src="/static/admin/img/icon-yes.svg"<img src="/static/admin/img/icon-yes.svg" alt="True"> </td>
+			{% elif che.check_evening == None %}
+							<td><img src="/static/admin/img/icon-unknown.svg"<img src="/static/admin/img/icon-unknown.svg" alt="unknown"> </td>
 			{% else %}
                            <td><img src="/static/admin/img/icon-no.svg" alt="False"> </td>
 			{% endif %}
-
 			</tr>
-			
 		{% endfor %}
-
 	  </tbody>
 	</table>
-
-
 </div>
 
 
